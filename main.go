@@ -22,11 +22,13 @@ func main() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
+	// some degree of graceful shutdown
 	go func() {
-		if err := app.Run(); err != nil {
-			log.Error(fmt.Sprintf("Error starting server: %s", err.Error()))
-		}
+		_ = <-done
+		log.Info("Going offline now, catch you later...")
+		_ = app.Kill()
 	}()
+
 	log.Info(
 		fmt.Sprintf(
 			"%s is listening on port `%v`",
@@ -35,12 +37,7 @@ func main() {
 		),
 	)
 
-	<-done
-
-	// some degree of graceful shutdown
-	if err := app.Kill(); err != nil {
-		log.Error("Failed to kill server: %s", err.Error())
-	} else {
-		log.Info("Going offline now, catch you later...")
+	if err := app.Run(); err != nil {
+		log.Error(fmt.Sprintf("Error starting server: %s", err.Error()))
 	}
 }

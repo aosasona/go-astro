@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: ./scripts/dev.Dockerfile
+    restart: on-failure
+    env_file:
+      - ../.env.development
+    volumes:
+      - ../:/app
+    ports:
+      - "8080:8080" # update this according to your environment

@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/charmbracelet/log v0.1.2
+	github.com/goccy/go-json v0.10.0
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/spf13/viper v1.15.0
 )
