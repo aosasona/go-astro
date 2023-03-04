@@ -1,0 +1,3 @@
+# Go-astro
+
+Golang plus Astro just feels right... so right I had to create a boilerplate to use every-time I need to spin up a new cool thing...
