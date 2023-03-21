@@ -1,1 +1,1 @@
-scripts/Dockerfile
+deployments/Dockerfile

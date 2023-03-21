@@ -1,0 +1,40 @@
+name: "app-dev"
+
+networks:
+  sidekyk:
+
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: ./deployments/dev.Dockerfile
+    container_name: api
+    env_file:
+      - ../.env.development
+    ports:
+      - "${PORT:-16000}:${PORT:-16000}"
+    restart: unless-stopped
+    volumes:
+      - ../:/app
+      - ../.env.development:/app/.env
+
+  postgres:
+    container_name: postgres
+    environment:
+      POSTGRES_DB: sidekyk_db
+      POSTGRES_PASSWORD: sidekyk
+      POSTGRES_USER: sidekyk
+    image: postgres:latest
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+
+version: "3.9"
+
+volumes:
+  postgres-data:

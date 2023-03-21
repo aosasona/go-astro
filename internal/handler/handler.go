@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"go-astro/ui"
+	"go-astro/web"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +26,7 @@ func (h *Handler) ServeAPI() {
 
 func (h *Handler) ServeUI() {
 	h.app.Use("/", filesystem.New(filesystem.Config{
-		Root:       http.FS(ui.UI),
+		Root:       http.FS(web.UI),
 		Browse:     false,
 		PathPrefix: "dist",
 	}))

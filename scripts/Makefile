@@ -4,8 +4,8 @@ build:
 	go generate ./...
 	go build -o ${TARGET_DIR}
 
-run-api-dev:
-	air -c .air.toml
+start-dev:
+	docker compose -f ./deployments/docker-compose.dev.yml up -d
 
-run-ui-dev:
-	cd ui/ && yarn dev
+start:
+	docker compose up -d

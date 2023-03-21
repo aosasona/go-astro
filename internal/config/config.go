@@ -20,15 +20,25 @@ type Config struct {
 	AppEnv         AppEnv `mapstructure:"APP_ENV"`
 	Port           string `mapstructure:"PORT"`
 	AllowedOrigins string `mapstructure:"ALLOWED_ORIGINS"`
+
+	DBName     string `mapstructure:"DB_NAME"`
+	DBUser     string `mapstructure:"DB_USER"`
+	DBPassword string `mapstructure:"DB_PASSWORD"`
+	DBHost     string `mapstructure:"DB_HOST"`
+	DBPort     string `mapstructure:"DB_PORT"`
+
+	RedisURL string `mapstructure:"REDIS_URL"`
 }
 
 func Load(path string) (*Config, error) {
 	c := new(Config)
 
-	err := c.LoadFromFile(path)
+	err := c.LoadWithViper(path)
 	if err != nil {
 		return c, err
 	}
+
+	log.Print(c)
 
 	return c.LoadDefaults(), nil
 }
@@ -43,7 +53,7 @@ func (c *Config) LoadDefaults() *Config {
 		c.Port = "8080"
 	}
 
-	if c.AppEnv == "" &&
+	if c.AppEnv == "" ||
 		(c.AppEnv != PRODUCTION && c.AppEnv != DEVELOPMENT && c.AppEnv != STAGING) {
 		log.Warn("Invalid app environment detected, defaulting to `development`")
 		c.AppEnv = DEVELOPMENT
@@ -56,10 +66,15 @@ func (c *Config) LoadDefaults() *Config {
 	return c
 }
 
-func (c *Config) LoadFromFile(path string) error {
+func (c *Config) LoadWithViper(path string) error {
 	viper.AddConfigPath(path)
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
+
+	viper.BindEnv("PORT", "PORT")
+	viper.BindEnv("APP_NAME", "APP_NAME")
+	viper.BindEnv("APP_ENV", "APP_ENV")
+	viper.BindEnv("ALLOWED_ORIGINS", "ALLOWED_ORIGINS")
 
 	viper.AutomaticEnv()
 
