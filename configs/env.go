@@ -65,20 +65,28 @@ func (c *Config) LoadDefaults() *Config {
 }
 
 func (c *Config) LoadWithViper(path string) error {
+	viper.AutomaticEnv()
+
 	viper.AddConfigPath(path)
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
-	viper.BindEnv("PORT", "PORT")
-	viper.BindEnv("APP_NAME", "APP_NAME")
-	viper.BindEnv("APP_ENV", "APP_ENV")
-	viper.BindEnv("ALLOWED_ORIGINS", "ALLOWED_ORIGINS")
+	viper.BindEnv("PORT")
+	viper.BindEnv("APP_NAME")
+	viper.BindEnv("APP_ENV")
+	viper.BindEnv("ALLOWED_ORIGINS")
 
-	viper.AutomaticEnv()
+	viper.BindEnv("DB_HOST")
+	viper.BindEnv("DB_NAME")
+	viper.BindEnv("DB_USER")
+	viper.BindEnv("DB_PASSWORD")
+	viper.BindEnv("DB_PORT")
+
+	viper.BindEnv("REDIS_URL")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return fmt.Errorf("unable to load environment variables: %v", err.Error())
+			return fmt.Errorf("unable to read from file: %v", err.Error())
 		}
 	}
 

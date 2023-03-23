@@ -1,10 +1,9 @@
 services:
   app:
     build: .
+    container_name: app
     env_file:
-      - .env.development
-    environment:
-      APP_ENV: production
+      - .env.production
     ports:
       - "${PORT:-8080}:${PORT:-8080}"
     restart: unless-stopped
