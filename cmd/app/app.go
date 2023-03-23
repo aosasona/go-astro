@@ -2,22 +2,24 @@ package app
 
 import (
 	"fmt"
-	"go-astro/internal/config"
-	"go-astro/internal/handler"
+	"go-astro/configs"
+	"go-astro/handlers"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"xorm.io/xorm"
 )
 
 type App struct {
 	app    *fiber.App
-	config config.Config
+	db     *xorm.Engine
+	config configs.Config
 }
 
-func New(config config.Config) *App {
+func New(config configs.Config, db *xorm.Engine) *App {
 	fiber := fiber.New(fiber.Config{
 		AppName:               config.AppName,
 		DisableStartupMessage: true,
@@ -26,6 +28,7 @@ func New(config config.Config) *App {
 	})
 	return &App{
 		app:    fiber,
+		db:     db,
 		config: config,
 	}
 }
@@ -40,9 +43,9 @@ func (a *App) Run() error {
 	app.Use(logger.New())
 	app.Use(recover.New())
 
-	h := handler.New(app)
-	h.ServeUI()
+	h := handlers.New(app)
 	h.ServeAPI()
+	h.ServeUI()
 
 	return app.Listen(fmt.Sprintf("0.0.0.0:%v", a.config.Port))
 }

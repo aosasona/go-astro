@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"go-astro/web"
@@ -19,7 +19,8 @@ func New(app *fiber.App) *Handler {
 }
 
 func (h *Handler) ServeAPI() {
-	r := h.app.Group("/api")
+	api := h.app.Group("/api")
+	r := api.Group("/v1")
 
 	r.Get("/health", h.checkHealth)
 }

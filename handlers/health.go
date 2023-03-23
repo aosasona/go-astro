@@ -1,7 +1,7 @@
-package handler
+package handlers
 
 import (
-	"go-astro/internal/response"
+	"go-astro/pkg/response"
 	"time"
 
 	"github.com/gofiber/fiber/v2"

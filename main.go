@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"go-astro/cmd/app"
-	"go-astro/internal/config"
+	"go-astro/configs"
+	"go-astro/db"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,12 +13,23 @@ import (
 )
 
 func main() {
-	config, err := config.Load(".")
+	config, err := configs.LoadEnv(".")
 	if err != nil {
-		panic(err.Error())
+		panic(err)
 	}
 
-	app := app.New(*config)
+	db, err := db.Connect(db.DatabaseConfig{
+		Host:     config.DBHost,
+		User:     config.DBUser,
+		Password: config.DBPassword,
+		DB:       config.DBName,
+		Port:     config.DBPort,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	app := app.New(*config, db)
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)

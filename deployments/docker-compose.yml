@@ -1,10 +1,12 @@
-version: "3.9"
-
 services:
   app:
     build: .
-    restart: on-failure
-    # env_file:
-    #   - ../.env
+    env_file:
+      - .env.development
+    environment:
+      APP_ENV: production
     ports:
-      - "8080:8080" # update this according to your environment
+      - "${PORT:-8080}:${PORT:-8080}"
+    restart: unless-stopped
+
+version: "3.9"

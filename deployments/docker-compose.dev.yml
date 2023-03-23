@@ -1,7 +1,7 @@
 name: "app-dev"
 
 networks:
-  sidekyk:
+  app:
 
 services:
   api:
@@ -21,9 +21,9 @@ services:
   postgres:
     container_name: postgres
     environment:
-      POSTGRES_DB: sidekyk_db
-      POSTGRES_PASSWORD: sidekyk
-      POSTGRES_USER: sidekyk
+      POSTGRES_DB: app_db
+      POSTGRES_PASSWORD: app
+      POSTGRES_USER: app
     image: postgres:latest
     restart: always
     volumes:

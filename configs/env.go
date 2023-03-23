@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"fmt"
@@ -25,20 +25,18 @@ type Config struct {
 	DBUser     string `mapstructure:"DB_USER"`
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	DBHost     string `mapstructure:"DB_HOST"`
-	DBPort     string `mapstructure:"DB_PORT"`
+	DBPort     int    `mapstructure:"DB_PORT"`
 
 	RedisURL string `mapstructure:"REDIS_URL"`
 }
 
-func Load(path string) (*Config, error) {
+func LoadEnv(path string) (*Config, error) {
 	c := new(Config)
 
 	err := c.LoadWithViper(path)
 	if err != nil {
 		return c, err
 	}
-
-	log.Print(c)
 
 	return c.LoadDefaults(), nil
 }
