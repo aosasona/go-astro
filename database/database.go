@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"fmt"
@@ -25,6 +25,11 @@ func Connect(config DatabaseConfig) (*xorm.Engine, error) {
 		config.DB,
 	)
 	engine, err := xorm.NewEngine("postgres", dbn)
+	if err != nil {
+		return nil, err
+	}
+
+	engine, err = xorm.NewEngine("postgres", dbn)
 	if err != nil {
 		return nil, err
 	}
