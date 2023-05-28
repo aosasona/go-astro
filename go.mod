@@ -4,9 +4,10 @@ go 1.20
 
 require (
 	github.com/charmbracelet/log v0.1.2
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goccy/go-json v0.10.0
 	github.com/gofiber/fiber/v2 v2.42.0
-	github.com/lib/pq v1.10.7
+	github.com/pocketbase/dbx v1.10.0
 	github.com/spf13/viper v1.15.0
 	go.uber.org/zap v1.21.0
 	xorm.io/xorm v1.3.2

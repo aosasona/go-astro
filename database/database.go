@@ -1,38 +1,29 @@
 package database
 
 import (
-	"fmt"
+	"go-astro/configs"
+	"log"
 
-	_ "github.com/lib/pq"
-	"xorm.io/xorm"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/pocketbase/dbx"
 )
 
-type DatabaseConfig struct {
-	DB       string
-	Host     string
-	User     string
-	Password string
-	Port     int
-}
+var Conn *dbx.DB
 
-func Connect(config DatabaseConfig) (*xorm.Engine, error) {
-	dbn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		config.Host,
-		config.Port,
-		config.User,
-		config.Password,
-		config.DB,
-	)
-	engine, err := xorm.NewEngine("postgres", dbn)
+func init() {
+	db, err := dbx.Open("mysql", configs.GlobalConfig.DSN)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	engine, err = xorm.NewEngine("postgres", dbn)
+	err = db.DB().Ping()
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	return engine, nil
+	if configs.GlobalConfig.AppEnv == configs.DEVELOPMENT {
+		db.LogFunc = log.Printf
+	}
+
+	Conn = db
 }

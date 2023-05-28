@@ -10,16 +10,16 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"xorm.io/xorm"
+	"github.com/pocketbase/dbx"
 )
 
 type App struct {
 	app    *fiber.App
-	db     *xorm.Engine
+	db     *dbx.DB
 	config configs.Config
 }
 
-func New(config configs.Config, db *xorm.Engine) *App {
+func New(config configs.Config, db *dbx.DB) *App {
 	fiber := fiber.New(fiber.Config{
 		AppName:               config.AppName,
 		DisableStartupMessage: true,

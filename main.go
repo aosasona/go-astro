@@ -5,16 +5,17 @@ import (
 	"go-astro/cmd/app"
 	"go-astro/configs"
 	"go-astro/database"
+	logi "log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/pocketbase/dbx"
 	"go.uber.org/zap"
-	"xorm.io/xorm"
 )
 
 var (
-	db     *xorm.Engine
+	db     *dbx.DB
 	config *configs.Config
 
 	log *zap.Logger
@@ -27,16 +28,12 @@ func init() {
 		panic(err)
 	}
 
-	db, err = database.Connect(database.DatabaseConfig{
-		Host:     config.DBHost,
-		User:     config.DBUser,
-		Password: config.DBPassword,
-		DB:       config.DBName,
-		Port:     config.DBPort,
-	})
-	if err != nil {
-		panic(err)
-	}
+	defer func(Conn *dbx.DB) {
+		err := Conn.Close()
+		if err != nil {
+			logi.Fatalf("failed to close database connection: %v", err)
+		}
+	}(database.Conn)
 
 	// Create new logger instance
 	if config.AppEnv == configs.DEVELOPMENT {

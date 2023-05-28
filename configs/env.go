@@ -2,12 +2,15 @@ package configs
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
 )
 
 type AppEnv string
+
+var GlobalConfig *Config // temporary
 
 const (
 	PRODUCTION  AppEnv = "production"
@@ -16,18 +19,25 @@ const (
 )
 
 type Config struct {
-	AppName        string `mapstructure:"APP_NAME"`
-	AppEnv         AppEnv `mapstructure:"APP_ENV"`
-	Port           string `mapstructure:"PORT"`
-	AllowedOrigins string `mapstructure:"ALLOWED_ORIGINS"`
+	IsDev              bool   `mapstructure:"-"`
+	AppName            string `mapstructure:"APP_NAME"`
+	AppEnv             AppEnv `mapstructure:"APP_ENV"`
+	AppURL             AppEnv `mapstructure:"APP_URL"`
+	AccessTokenSecret  string `mapstructure:"ACCESS_TOKEN_SECRET"`
+	RefreshTokenSecret string `mapstructure:"REFRESH_TOKEN_SECRET"`
+	Port               string `mapstructure:"PORT"`
+	AllowedOrigins     string `mapstructure:"ALLOWED_ORIGINS"`
+	TrialDuration      uint   `mapstructure:"TRIAL_DURATION"`
+	DSN                string `mapstructure:"DSN"`
+	RedisDSN           string `mapstructure:"REDIS_DSN"`
+}
 
-	DBName     string `mapstructure:"DB_NAME"`
-	DBUser     string `mapstructure:"DB_USER"`
-	DBPassword string `mapstructure:"DB_PASSWORD"`
-	DBHost     string `mapstructure:"DB_HOST"`
-	DBPort     int    `mapstructure:"DB_PORT"`
-
-	RedisURL string `mapstructure:"REDIS_URL"`
+func init() {
+	var err error
+	GlobalConfig, err = LoadEnv(".")
+	if err != nil {
+		panic("unable to read config")
+	}
 }
 
 func LoadEnv(path string) (*Config, error) {
@@ -38,12 +48,13 @@ func LoadEnv(path string) (*Config, error) {
 		return c, err
 	}
 
+	c.IsDev = c.AppEnv == DEVELOPMENT
 	return c.LoadDefaults(), nil
 }
 
 func (c *Config) LoadDefaults() *Config {
 	if c.AppName == "" {
-		c.AppName = "Cool App"
+		c.AppName = "Sidekyk"
 	}
 
 	if c.Port == "" {
@@ -61,6 +72,10 @@ func (c *Config) LoadDefaults() *Config {
 		c.AllowedOrigins = "*"
 	}
 
+	if c.TrialDuration == 0 {
+		c.TrialDuration = 1
+	}
+
 	return c
 }
 
@@ -71,18 +86,13 @@ func (c *Config) LoadWithViper(path string) error {
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
-	viper.BindEnv("PORT")
-	viper.BindEnv("APP_NAME")
-	viper.BindEnv("APP_ENV")
-	viper.BindEnv("ALLOWED_ORIGINS")
+	reflectType := reflect.TypeOf(*c)
 
-	viper.BindEnv("DB_HOST")
-	viper.BindEnv("DB_NAME")
-	viper.BindEnv("DB_USER")
-	viper.BindEnv("DB_PASSWORD")
-	viper.BindEnv("DB_PORT")
-
-	viper.BindEnv("REDIS_URL")
+	for i := 0; i < reflectType.NumField(); i++ {
+		field := reflectType.Field(i)
+		tag := field.Tag.Get("mapstructure")
+		viper.BindEnv(tag)
+	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
